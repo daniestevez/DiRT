@@ -439,8 +439,12 @@ module axis_stream_to_pkt_backpressured
    end // always_ff @ (posedge clk)
 
    always_ff @(posedge clk) begin
-      // this register does not need a reset
-      fifos_reset <= output_state == S_FIFO_RESET;      
+      // This register does not need a reset
+      //
+      // !enable used here to release the reset one cycle earlier. This is
+      // needed to avoid losing data on enable due to the FIFO being reset while
+      // the first samples beat is written.
+      fifos_reset <= (output_state == S_FIFO_RESET) && !enable;
    end
 
    //
